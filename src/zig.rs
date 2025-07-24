@@ -1299,6 +1299,22 @@ pub fn prepare_zig_linker(target: &str) -> Result<ZigWrapper> {
                 "-target {zig_arch}-windows-{target_env}{abi_suffix}"
             ));
         }
+        OperatingSystem::Freebsd => {
+            let zig_arch = match arch.as_str() {
+                "i686" => {
+                    let zig_version = Zig::zig_version()?;
+                    if zig_version.major == 0 && zig_version.minor >= 11 {
+                        "x86"
+                    } else {
+                        "i386"
+                    }
+                }
+                arch => arch,
+            };
+            cc_args.push(format!(
+                "-target {zig_arch}-freebsd{abi_suffix}"
+            ));
+        }
         OperatingSystem::Emscripten => {
             cc_args.push(format!("-target {arch}-emscripten{abi_suffix}"));
         }
